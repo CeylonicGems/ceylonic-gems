@@ -100,4 +100,20 @@
   font-weight: 700;
   line-height: 1;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}.mobile-dashboard-link {
+  display: none;
+}
+
+@media (max-width: 680px) {
+  .mobile-dashboard-link {
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+    margin-top: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    text-align: center;
+    font-weight: 700;
+    color: #ffffff;
+  }
 }
