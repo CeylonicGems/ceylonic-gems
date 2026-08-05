@@ -45,18 +45,36 @@ export function SiteHeader() {
       </button>
 
       <nav className={open ? "main-nav open" : "main-nav"}>
-        <Link href="/#lobby">Gem Lobby</Link>
-        <Link href="/gems">Our Gems</Link>
-        <Link href="/appointment">Book Appointment</Link>
-        <Link href="/#about">About</Link>
-        <Link href="/#contact">Contact</Link>
+  <Link href="/#lobby" onClick={() => setOpen(false)}>
+    Gem Lobby
+  </Link>
 
-        {signed && (
-          <Link className="mobile-dashboard-link" href="/dashboard">
-            Dashboard
-          </Link>
-        )}
-      </nav>
+  <Link href="/gems" onClick={() => setOpen(false)}>
+    Our Gems
+  </Link>
+
+  <Link href="/appointment" onClick={() => setOpen(false)}>
+    Book Appointment
+  </Link>
+
+  <Link href="/#about" onClick={() => setOpen(false)}>
+    About
+  </Link>
+
+  <Link href="/#contact" onClick={() => setOpen(false)}>
+    Contact
+  </Link>
+
+  {signed && (
+    <Link
+      className="mobile-dashboard-link"
+      href="/dashboard"
+      onClick={() => setOpen(false)}
+    >
+      Dashboard
+    </Link>
+  )}
+</nav>
 
       <div className="header-actions">
         {signed ? (
