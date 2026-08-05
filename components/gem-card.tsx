@@ -1,3 +1,9 @@
 import Link from "next/link"; import type{Gem}from"@/types";
 const money=(n:number,c:string)=>new Intl.NumberFormat("en-US",{style:"currency",currency:c,maximumFractionDigits:c==="LKR"?0:2}).format(n);
-export function GemCard({gem}:{gem:Gem}){return <article className="gem-card"><Link className="gem-image" href={`/gems/${gem.id}`}><span className="pill">{gem.availability}</span><img src={gem.cover_image_path??"/gems/approved-gem.svg"} alt={gem.name}/></Link><div className="gem-card-body"><div className="row"><strong>{gem.name}</strong><span>{gem.rating?`${gem.rating.toFixed(1)}★`:"New"}</span></div><div className="muted-row"><span>{gem.carat} ct</span><span>{gem.origin??"Origin pending"}</span></div><div className="row"><strong className="price">{money(gem.price,gem.currency)}</strong><Link className="text-link" href={`/gems/${gem.id}`}>View stone →</Link></div></div></article>}
+export function GemCard({gem}:{gem:Gem}){return <article className="gem-card"><Link className="gem-image" href={`/gems/${gem.id}`}><span className="pill">{gem.availability}</span><div className="gem-card-media">
+  <img
+    src={gem.cover_image_path ?? "/gems/approved-gem.svg"}
+    alt={gem.name}
+    className="gem-card-image"
+  />
+</div></Link><div className="gem-card-body"><div className="row"><strong>{gem.name}</strong><span>{gem.rating?`${gem.rating.toFixed(1)}★`:"New"}</span></div><div className="muted-row"><span>{gem.carat} ct</span><span>{gem.origin??"Origin pending"}</span></div><div className="row"><strong className="price">{money(gem.price,gem.currency)}</strong><Link className="text-link" href={`/gems/${gem.id}`}>View stone →</Link></div></div></article>}
