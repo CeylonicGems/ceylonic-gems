@@ -3,7 +3,7 @@ import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { PayHereButton } from "@/components/payhere-button";
 import { SellerOfferActions } from "@/components/seller-offer-actions";
-
+import { SellerDeletionRequestButton } from "@/components/seller-deletion-request-button";
 export default async function SellerDashboard() {
   const { user, profile } = await requireRole(["seller", "both"]);
   const supabase = await createClient();
@@ -119,9 +119,21 @@ export default async function SellerDashboard() {
                   <span className="pill">{gem.status}</span>{" "}
                   <span className="pill">Payment: {gem.payment_status}</span>
                 </div>
-                {gem.payment_status !== "paid" && (
-                  <PayHereButton purpose="listing_fee" referenceId={gem.id} label="Pay LKR 500" />
-                )}
+                <div className="row start">
+  {gem.payment_status !== "paid" && (
+    <PayHereButton
+      purpose="listing_fee"
+      referenceId={gem.id}
+      label="Pay LKR 500"
+    />
+  )}
+
+  <SellerDeletionRequestButton
+    gemId={gem.id}
+    gemName={gem.name}
+    deletionRequested={Boolean(gem.deletion_requested)}
+  />
+</div>
               </article>
             ))
           ) : (
