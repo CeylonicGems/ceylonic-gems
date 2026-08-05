@@ -91,4 +91,13 @@
   top: 16px;
   left: 16px;
   z-index: 3;
+
+  background: #16833b;
+  color: #ffffff;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
