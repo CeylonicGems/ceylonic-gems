@@ -9,38 +9,92 @@ export default async function AdminDashboard() {
   const supabase = await createClient();
 
   const [
-    { data: gems },
-    { data: verifications },
-    { count: users },
-    { count: published },
-    { data: payments },
-    { data: appointments },
-    { data: transactions }
-  ] = await Promise.all([
-    supabase
-      .from("gems")
-      .select("*,seller:profiles!gems_seller_id_fkey(display_name,verification_status)")
-      .in("status", ["payment_pending", "pending", "changes_requested"])
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("identity_verifications")
-      .select("*,profile:profiles(display_name,role,citizenship)")
-      .eq("status", "pending")
-      .order("created_at", { ascending: false }),
-    supabase.from("profiles").select("*", { count: "exact", head: true }),
-    supabase.from("gems").select("*", { count: "exact", head: true }).eq("status", "published"),
-    supabase.from("payments").select("*").order("created_at", { ascending: false }).limit(10),
-    supabase
-      .from("appointments")
-      .select("*,buyer:profiles!appointments_buyer_id_fkey(display_name),gem:gems(name)")
-      .in("status", ["pending", "approved", "rescheduled"])
-      .order("preferred_at", { ascending: true }),
-    supabase
-      .from("transactions")
-      .select("*,gem:gems(name),buyer:profiles!transactions_buyer_id_fkey(display_name),seller:profiles!transactions_seller_id_fkey(display_name)")
-      .order("created_at", { ascending: false })
-      .limit(20)
-  ]);
+  { data: gems },
+  { data: deletionRequests },
+  { data: verifications },
+  { count: users },
+  { count: published },
+  { data: payments },
+  { data: appointments },
+  { data: transactions }
+] = await Promise.all([
+  supabase
+    .from("gems")
+    .select(
+      "*,seller:profiles!gems_seller_id_fkey(display_name,verification_status)"
+    )
+    .in("status", [
+      "payment_pending",
+      "pending",
+      "changes_requested"
+    ])
+    .order("created_at", { ascending: false }),
+
+  supabase
+    .from("gems")
+    .select(`
+      id,
+      name,
+      carat,
+      status,
+      deletion_reason,
+      deletion_requested_at,
+      seller:profiles!gems_seller_id_fkey(display_name)
+    `)
+    .eq("deletion_requested", true)
+    .order("deletion_requested_at", {
+      ascending: false
+    }),
+
+  supabase
+    .from("identity_verifications")
+    .select(
+      "*,profile:profiles(display_name,role,citizenship)"
+    )
+    .eq("status", "pending")
+    .order("created_at", { ascending: false }),
+
+  supabase
+    .from("profiles")
+    .select("*", {
+      count: "exact",
+      head: true
+    }),
+
+  supabase
+    .from("gems")
+    .select("*", {
+      count: "exact",
+      head: true
+    })
+    .eq("status", "published"),
+
+  supabase
+    .from("payments")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(10),
+
+  supabase
+    .from("appointments")
+    .select(
+      "*,buyer:profiles!appointments_buyer_id_fkey(display_name),gem:gems(name)"
+    )
+    .in("status", [
+      "pending",
+      "approved",
+      "rescheduled"
+    ])
+    .order("preferred_at", { ascending: true }),
+
+  supabase
+    .from("transactions")
+    .select(
+      "*,gem:gems(name),buyer:profiles!transactions_buyer_id_fkey(display_name),seller:profiles!transactions_seller_id_fkey(display_name)"
+    )
+    .order("created_at", { ascending: false })
+    .limit(20)
+]);
 
   return (
     <section className="section top-section">
@@ -110,6 +164,64 @@ export default async function AdminDashboard() {
           </div>
         </section>
       </div>
+
+      <section className="panel">
+        <div className="row">
+          <h2>Gemstone Deletion Requests</h2>
+
+          <span className="pill">
+            {deletionRequests?.length ?? 0} waiting
+          </span>
+        </div>
+
+        <div className="list">
+          {deletionRequests?.length ? (
+            deletionRequests.map((gem: any) => (
+              <article className="admin-card" key={gem.id}>
+                <div className="row">
+                  <div>
+                    <strong>{gem.name}</strong>
+
+                    <small>
+                      {gem.seller?.display_name ?? "Seller"} ·{" "}
+                      {gem.carat} ct
+                    </small>
+                  </div>
+
+                  <span className="pill">
+                    Deletion Requested
+                  </span>
+                </div>
+
+                <p>
+                  <strong>Seller&apos;s reason:</strong>{" "}
+                  {gem.deletion_reason ??
+                    "No reason was provided."}
+                </p>
+
+                <div className="muted-row">
+                  <span>
+                    Current status: {gem.status}
+                  </span>
+
+                  {gem.deletion_requested_at && (
+                    <span>
+                      Requested:{" "}
+                      {new Date(
+                        gem.deletion_requested_at
+                      ).toLocaleString()}
+                    </span>
+                  )}
+                </div>
+              </article>
+            ))
+          ) : (
+            <div className="empty-state">
+              No gemstone deletion requests.
+            </div>
+          )}
+        </div>
+      </section>
 
       <div className="dashboard-grid">
         <section className="panel">
