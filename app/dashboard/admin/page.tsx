@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AdminListingActions } from "@/components/admin-actions";
 import { AdminVerificationActions } from "@/components/admin-verification-actions";
 import { AdminAppointmentActions } from "@/components/admin-appointment-actions";
+import { AdminDeletionActions } from "@/components/admin-deletion-actions";
 
 export default async function AdminDashboard() {
   await requireRole(["admin"]);
@@ -213,6 +214,7 @@ export default async function AdminDashboard() {
                     </span>
                   )}
                 </div>
+                <AdminDeletionActions listingId={gem.id} />
               </article>
             ))
           ) : (
