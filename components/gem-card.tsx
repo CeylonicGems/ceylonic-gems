@@ -6,4 +6,8 @@ export function GemCard({gem}:{gem:Gem}){return <article className="gem-card"><L
     alt={gem.name}
     className="gem-card-image"
   />
+
+  <span className="gem-availability">
+    {gem.availability}
+  </span>
 </div></Link><div className="gem-card-body"><div className="row"><strong>{gem.name}</strong><span>{gem.rating?`${gem.rating.toFixed(1)}★`:"New"}</span></div><div className="muted-row"><span>{gem.carat} ct</span><span>{gem.origin??"Origin pending"}</span></div><div className="row"><strong className="price">{money(gem.price,gem.currency)}</strong><Link className="text-link" href={`/gems/${gem.id}`}>View stone →</Link></div></div></article>}
