@@ -1,0 +1,1 @@
+import{requireUser}from"@/lib/auth";import{VerificationForm}from"@/components/verification-form";export default async function VerificationPage(){const{user,profile}=await requireUser();return <section className="section top-section narrow"><VerificationForm userId={user.id} citizenship={profile.citizenship}/></section>}

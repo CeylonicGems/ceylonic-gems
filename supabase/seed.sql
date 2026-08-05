@@ -1,0 +1,2 @@
+-- The app displays local demo gemstones when no published database rows exist.
+-- Create real seller accounts and submit listings through the seller dashboard.

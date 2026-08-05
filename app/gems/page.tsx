@@ -1,0 +1,2 @@
+import{GemCard}from"@/components/gem-card";import{getPublishedGems}from"@/lib/data";
+export default async function GemsPage(){const gems=await getPublishedGems();return <section className="section top-section"><div className="section-heading"><div><span className="eyebrow">OUR GEMS</span><h1>A curated gemstone collection.</h1></div><p>Published listings have passed marketplace review. Treatment and certificate status remain clearly disclosed.</p></div><div className="gem-grid">{gems.map(g=><GemCard gem={g} key={g.id}/>)}</div></section>}

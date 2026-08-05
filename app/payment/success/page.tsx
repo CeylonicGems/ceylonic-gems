@@ -1,0 +1,1 @@
+import Link from"next/link";export default function Page(){return <section className="auth-page"><div className="panel auth-form"><span className="eyebrow">PAYMENT RETURN</span><h1>Payment submitted.</h1><p>Your dashboard updates only after the server verifies the PayHere notification.</p><Link className="button primary" href="/dashboard">Open Dashboard</Link></div></section>}

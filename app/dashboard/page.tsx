@@ -1,0 +1,1 @@
+import{redirect}from"next/navigation";import{requireUser}from"@/lib/auth";export default async function Dashboard(){const{profile}=await requireUser();if(profile.role==="admin")redirect("/dashboard/admin");if(profile.role==="seller"||profile.role==="both")redirect("/dashboard/seller");redirect("/dashboard/buyer")}

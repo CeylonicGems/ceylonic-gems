@@ -1,0 +1,2 @@
+import Link from"next/link";import{Suspense}from"react";import{LoginForm}from"@/components/auth/login-form";
+export default function LoginPage(){return <section className="auth-page"><div className="role-links"><Link href="/login?role=buyer">Buyer Login</Link><Link href="/login?role=seller">Seller Login</Link><Link href="/login?role=admin">Owner / Admin Login</Link></div><Suspense fallback={<div className="panel">Loading secure login…</div>}><LoginForm/></Suspense><p>New account? <Link className="text-link" href="/register">Create an account</Link></p></section>}

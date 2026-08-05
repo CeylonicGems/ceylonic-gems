@@ -1,0 +1,1 @@
+import Link from"next/link";export default function Page(){return <section className="auth-page"><div className="panel auth-form"><span className="eyebrow">PAYMENT CANCELLED</span><h1>No payment was completed.</h1><p>Return to the seller dashboard and try again.</p><Link className="button primary" href="/dashboard/seller">Seller Dashboard</Link></div></section>}

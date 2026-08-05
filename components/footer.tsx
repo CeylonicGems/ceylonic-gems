@@ -1,0 +1,2 @@
+import Link from "next/link";
+export function Footer(){return <footer className="footer"><div><Link className="brand" href="/"><span className="brand-mark">◆</span><span>Ceylonic Gems</span></Link><p>Premium gemstone discovery, private offers and verified marketplace workflows.</p></div><div className="footer-links"><Link href="/#about">Privacy</Link><Link href="/#about">Terms</Link><Link href="/appointment">Buyer Protection</Link><Link href="/appointment">International Shipping</Link></div></footer>}
