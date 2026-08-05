@@ -27,7 +27,8 @@ export async function getPublishedGems(): Promise<Gem[]> {
       .from("gems")
       .select("*,seller:profiles!gems_seller_id_fkey(display_name)")
       .eq("status", "published")
-      .order("published_at", { ascending: false });
+.eq("deletion_requested", false)
+.order("published_at", { ascending: false });
 
     if (error || !data?.length) return demoGems;
     return data.map((row: any) => ({
@@ -52,8 +53,9 @@ export async function getGemById(id: string): Promise<Gem | null> {
       .from("gems")
       .select("*,seller:profiles!gems_seller_id_fkey(display_name),media:gem_media(id,path,media_type,sort_order)")
       .eq("id", id)
-      .eq("status", "published")
-      .maybeSingle();
+.eq("status", "published")
+.eq("deletion_requested", false)
+.maybeSingle();
 
     if (error || !data) return demo ?? null;
 
