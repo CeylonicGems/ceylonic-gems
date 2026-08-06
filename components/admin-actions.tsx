@@ -1,6 +1,12 @@
 "use client";
 
-import { useState } from "react";
+/* eslint-disable @next/next/no-img-element */
+
+import {
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 
 type ReviewFile = {
   label: string;
@@ -16,35 +22,61 @@ export function AdminListingActions({
   paymentStatus: string;
 }) {
   const [busy, setBusy] = useState(false);
+  const [reviewBusy, setReviewBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState<ReviewFile[]>([]);
 
-  async function review() {
-    setBusy(true);
-    setMessage("");
+  const loadFiles = useCallback(
+    async (showSuccessMessage: boolean) => {
+      setReviewBusy(true);
 
-    try {
-      const response = await fetch(
-        `/api/admin/listings/${listingId}/files`,
-        { cache: "no-store" }
-      );
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        setMessage(result.error ?? "Review files failed.");
-      } else {
-        setFiles(result.files ?? []);
-        setMessage(
-          "Certificate links expire in five minutes."
+      try {
+        const response = await fetch(
+          `/api/admin/listings/${listingId}/files`,
+          {
+            cache: "no-store",
+          }
         );
+
+        const result = await response
+          .json()
+          .catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(
+            result.error ?? "Review files failed."
+          );
+        }
+
+        setFiles(result.files ?? []);
+
+        if (showSuccessMessage) {
+          setMessage(
+            "Media loaded. Secure file links expire in five minutes."
+          );
+        }
+      } catch (error) {
+        setFiles([]);
+
+        setMessage(
+          error instanceof Error
+            ? error.message
+            : "Review files failed."
+        );
+      } finally {
+        setReviewBusy(false);
       }
-    } catch {
-      setMessage("Review files failed.");
-    } finally {
-      setBusy(false);
-    }
-  }
+    },
+    [listingId]
+  );
+
+  /*
+   * Automatically load the seller's current media
+   * when the admin approval card appears.
+   */
+  useEffect(() => {
+    void loadFiles(false);
+  }, [loadFiles]);
 
   async function act(
     action: "approve" | "changes_requested" | "reject"
@@ -74,11 +106,16 @@ export function AdminListingActions({
           headers: {
             "content-type": "application/json",
           },
-          body: JSON.stringify({ action, note }),
+          body: JSON.stringify({
+            action,
+            note,
+          }),
         }
       );
 
-      const result = await response.json();
+      const result = await response
+        .json()
+        .catch(() => ({}));
 
       setMessage(
         response.ok
@@ -87,7 +124,9 @@ export function AdminListingActions({
       );
 
       if (response.ok) {
-        setTimeout(() => location.reload(), 500);
+        setTimeout(() => {
+          location.reload();
+        }, 500);
       }
     } catch {
       setMessage("Action failed.");
@@ -122,75 +161,149 @@ export function AdminListingActions({
 
       if (!response.ok) {
         setMessage(
-          result.error ?? "Unable to delete gemstone."
+          result.error ??
+            "Unable to delete gemstone."
         );
+
         return;
       }
 
-      setMessage("Gemstone deleted successfully.");
+      setMessage(
+        "Gemstone deleted successfully."
+      );
 
       setTimeout(() => {
         location.reload();
       }, 500);
     } catch {
-      setMessage("Unable to delete gemstone.");
+      setMessage(
+        "Unable to delete gemstone."
+      );
     } finally {
       setBusy(false);
     }
   }
 
+  const images = files.filter(
+    (file) => file.type === "image"
+  );
+
+  const videos = files.filter(
+    (file) => file.type === "video"
+  );
+
+  const certificates = files.filter(
+    (file) => file.type === "certificate"
+  );
+
   return (
     <div>
-      <div className="action-group">
-        <button
-          type="button"
-          className="button ghost"
-          disabled={busy}
-          onClick={review}
-        >
-          Review Media & Certificates
-        </button>
+      {reviewBusy && (
+        <div className="notice">
+          Loading seller media...
+        </div>
+      )}
 
-        <button
-          type="button"
-          className="button approve"
-          disabled={busy || paymentStatus !== "paid"}
-          onClick={() => act("approve")}
+      {images.length > 0 && (
+        <div
+          style={{
+            display: "grid",
+            gap: "16px",
+            marginBottom: "20px",
+          }}
         >
-          Publish
-        </button>
+          <strong>
+            Seller uploaded photographs
+          </strong>
 
-        <button
-          type="button"
-          className="button ghost"
-          disabled={busy}
-          onClick={() => act("changes_requested")}
+          {images.map((file, index) => (
+            <div
+              className="panel"
+              key={`${file.url}-${index}`}
+            >
+              <img
+                src={file.url}
+                alt={`Seller gemstone photograph ${
+                  index + 1
+                }`}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  maxHeight: "440px",
+                  objectFit: "contain",
+                  borderRadius: "12px",
+                  marginBottom: "12px",
+                }}
+              />
+
+              <a
+                className="button ghost compact"
+                href={file.url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Open full image {index + 1}
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {videos.length > 0 && (
+        <div
+          style={{
+            display: "grid",
+            gap: "16px",
+            marginBottom: "20px",
+          }}
         >
-          Request Changes
-        </button>
+          <strong>
+            Seller uploaded video
+          </strong>
 
-        <button
-          type="button"
-          className="button danger"
-          disabled={busy}
-          onClick={() => act("reject")}
+          {videos.map((file, index) => (
+            <div
+              className="panel"
+              key={`${file.url}-${index}`}
+            >
+              <video
+                controls
+                preload="metadata"
+                src={file.url}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  maxHeight: "440px",
+                  borderRadius: "12px",
+                  marginBottom: "12px",
+                }}
+              />
+
+              <a
+                className="button ghost compact"
+                href={file.url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Open full video
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {certificates.length > 0 && (
+        <div
+          className="private-file-links"
+          style={{
+            marginBottom: "20px",
+          }}
         >
-          Reject
-        </button>
+          <strong>
+            Seller certificates
+          </strong>
 
-        <button
-          type="button"
-          className="button danger"
-          disabled={busy}
-          onClick={deleteListing}
-        >
-          {busy ? "Please wait..." : "Delete Gemstone"}
-        </button>
-      </div>
-
-      {files.length > 0 && (
-        <div className="private-file-links">
-          {files.map((file, index) => (
+          {certificates.map((file, index) => (
             <a
               className="button ghost compact"
               key={`${file.url}-${index}`}
@@ -204,14 +317,77 @@ export function AdminListingActions({
         </div>
       )}
 
+      <div className="action-group">
+        <button
+          type="button"
+          className="button ghost"
+          disabled={busy || reviewBusy}
+          onClick={() => {
+            setMessage("");
+            void loadFiles(true);
+          }}
+        >
+          {reviewBusy
+            ? "Loading Media..."
+            : "Refresh Media & Certificates"}
+        </button>
+
+        <button
+          type="button"
+          className="button approve"
+          disabled={
+            busy ||
+            reviewBusy ||
+            paymentStatus !== "paid"
+          }
+          onClick={() => act("approve")}
+        >
+          Publish
+        </button>
+
+        <button
+          type="button"
+          className="button ghost"
+          disabled={busy || reviewBusy}
+          onClick={() =>
+            act("changes_requested")
+          }
+        >
+          Request Changes
+        </button>
+
+        <button
+          type="button"
+          className="button danger"
+          disabled={busy || reviewBusy}
+          onClick={() => act("reject")}
+        >
+          Reject
+        </button>
+
+        <button
+          type="button"
+          className="button danger"
+          disabled={busy || reviewBusy}
+          onClick={deleteListing}
+        >
+          {busy
+            ? "Please wait..."
+            : "Delete Gemstone"}
+        </button>
+      </div>
+
       {paymentStatus !== "paid" && (
         <small>
-          Publication is locked until the listing fee is paid.
+          Publication is locked until the listing
+          fee is paid.
         </small>
       )}
 
       {message && (
-        <div className="notice">{message}</div>
+        <div className="notice">
+          {message}
+        </div>
       )}
     </div>
   );
