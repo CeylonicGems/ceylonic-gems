@@ -1043,3 +1043,54 @@
     height: 34px;
   }
 }
+/* Official Ceylonic Gems footer branding */
+
+.footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.88rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.footer-logo-image {
+  display: block;
+  width: auto;
+  height: 38px;
+  object-fit: contain;
+
+  filter:
+    drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 0 7px rgba(44, 92, 255, 0.16));
+
+  transition:
+    transform 200ms ease,
+    filter 200ms ease;
+}
+
+.footer-brand:hover .footer-logo-image {
+  transform: scale(1.06);
+
+  filter:
+    drop-shadow(0 3px 7px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 0 11px rgba(55, 112, 255, 0.3))
+    drop-shadow(0 0 10px rgba(216, 172, 55, 0.2));
+}
+
+.footer-brand:hover {
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .footer-logo-image {
+    height: 34px;
+  }
+
+  .footer-brand {
+    font-size: 0.82rem;
+  }
+}

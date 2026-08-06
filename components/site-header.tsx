@@ -226,8 +226,8 @@ export function SiteHeader() {
     className="brand-logo-image"
     src="/ceylonic-gems-logo.png"
     alt="Ceylonic Gems"
-    width={46}
-    height={46}
+    width={40}
+    height={40}
     priority
   />
 </Link>
