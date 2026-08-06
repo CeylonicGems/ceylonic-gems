@@ -46,14 +46,15 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       };
     }));
 
-    await admin.from("audit_logs").insert(
-      actor_id: user.id,
-      action: "listing_files_viewed",
-      entity_type: "gem",
-      entity_id: id,
-      details: {
-  media_count: signedMedia.length,
-  certificate_count: privateCertificates.length,
+   await admin.from("audit_logs").insert({
+  actor_id: user.id,
+  action: "listing_files_viewed",
+  entity_type: "gem",
+  entity_id: id,
+  details: {
+    media_count: signedMedia.length,
+    certificate_count: privateCertificates.length,
+  },
 });
 
     return NextResponse.json({
