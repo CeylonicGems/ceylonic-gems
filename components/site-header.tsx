@@ -1,4 +1,5 @@
 "use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -225,8 +226,8 @@ export function SiteHeader() {
     className="brand-logo-image"
     src="/ceylonic-gems-logo.png"
     alt="Ceylonic Gems"
-    width={40}
-    height={40}
+    width={46}
+    height={46}
     priority
   />
 </Link>
