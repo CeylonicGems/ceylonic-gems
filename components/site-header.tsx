@@ -216,7 +216,19 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="site-header">
+     <Link
+  className="mobile-header-brand"
+  href="/"
+  aria-label="Ceylonic Gems home"
+>
+  <Image
+    src="/ceylonic-gems-logo.png"
+    alt=""
+    width={38}
+    height={38}
+    priority
+  />
+</Link>
         <Link
   className="brand"
   href="/"
@@ -241,11 +253,35 @@ export function SiteHeader() {
           ☰
         </button>
 
-        <nav
-          className={
-            open ? "main-nav open" : "main-nav"
-          }
-        >
+       <nav className={open ? "main-nav open" : "main-nav"}>
+  <Link
+    className="desktop-nav-logo"
+    href="/"
+    aria-label="Ceylonic Gems home"
+    onClick={() => setOpen(false)}
+  >
+    <Image
+      src="/ceylonic-gems-logo.png"
+      alt=""
+      width={22}
+      height={22}
+      priority
+    />
+  </Link>
+
+  <Link
+    href="/#lobby"
+    onClick={() => setOpen(false)}
+  >
+    Gem Lobby
+  </Link>
+
+  <Link
+    href="/gems"
+    onClick={() => setOpen(false)}
+  >
+    Our Gems
+  </Link>
           <Link
             href="/#lobby"
             onClick={() => setOpen(false)}
