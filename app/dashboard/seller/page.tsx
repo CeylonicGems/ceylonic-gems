@@ -120,6 +120,15 @@ export default async function SellerDashboard() {
                   <span className="pill">Payment: {gem.payment_status}</span>
                 </div>
                 <div className="row start">
+  {!gem.deletion_requested && gem.status !== "sold" && (
+    <Link
+      className="button ghost compact"
+      href={`/dashboard/seller/gems/${gem.id}/edit`}
+    >
+      Edit Gemstone
+    </Link>
+  )}
+
   {gem.payment_status !== "paid" && (
     <PayHereButton
       purpose="listing_fee"
@@ -131,7 +140,9 @@ export default async function SellerDashboard() {
   <SellerDeletionRequestButton
     gemId={gem.id}
     gemName={gem.name}
-    deletionRequested={Boolean(gem.deletion_requested)}
+    deletionRequested={Boolean(
+      gem.deletion_requested
+    )}
   />
 </div>
               </article>
