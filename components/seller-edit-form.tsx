@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { CURRENCY_CODES } from "@/data/currencies";
 
 type EditableGem = {
@@ -235,7 +236,42 @@ export function SellerEditForm({
           required
         />
       </label>
+<div className="panel">
+  <h3>Replace media</h3>
 
+  <p>
+    These fields are optional. Leave them empty to keep the
+    existing photographs, video and certificate.
+  </p>
+
+  <label>
+    New gemstone photographs
+    <input
+      name="replacementImages"
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      multiple
+    />
+  </label>
+
+  <label>
+    New gemstone video
+    <input
+      name="replacementVideo"
+      type="file"
+      accept="video/mp4,video/webm"
+    />
+  </label>
+
+  <label>
+    New certificate image or PDF
+    <input
+      name="replacementCertificate"
+      type="file"
+      accept="image/jpeg,image/png,application/pdf"
+    />
+  </label>
+</div>
       <label>
         Reason for editing
         <textarea
