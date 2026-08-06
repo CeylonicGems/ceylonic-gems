@@ -764,3 +764,110 @@
     font-size: 0.55rem;
   }
 }
+/* Luxury gemstone roll-down hover effect */
+
+.gem-category-item {
+  position: relative;
+  min-height: 68px;
+  overflow: visible;
+}
+
+.gem-category-icon {
+  position: relative;
+  z-index: 2;
+
+  width: 30px;
+  height: 30px;
+
+  transform: translateY(0) rotate(0deg) scale(1);
+
+  transition:
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 220ms ease,
+    opacity 220ms ease,
+    filter 220ms ease;
+}
+
+.gem-category-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* Soft light beneath the gemstone */
+
+.gem-category-item::before {
+  content: "";
+
+  position: absolute;
+  top: 38px;
+  left: 50%;
+
+  width: 42px;
+  height: 16px;
+
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+
+  opacity: 0;
+  filter: blur(10px);
+  transform: translateX(-50%) scale(0.55);
+
+  transition:
+    opacity 260ms ease,
+    transform 320ms ease;
+}
+
+/* Gemstone moves down, rolls and becomes larger */
+
+.gem-category-item:hover .gem-category-icon {
+  color: #ffffff;
+  opacity: 1;
+
+  transform:
+    translateY(7px)
+    rotate(10deg)
+    scale(1.32);
+
+  filter:
+    drop-shadow(0 0 5px rgba(255, 255, 255, 0.95))
+    drop-shadow(0 0 14px rgba(255, 255, 255, 0.5))
+    drop-shadow(0 8px 14px rgba(0, 0, 0, 0.55));
+}
+
+.gem-category-item:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+.gem-category-name {
+  transition:
+    transform 260ms ease,
+    color 220ms ease,
+    opacity 220ms ease;
+}
+
+.gem-category-item:hover .gem-category-name {
+  color: #ffffff;
+  transform: translateY(7px);
+}
+
+/* Keep the category bar clean and thin */
+
+.gem-category-track {
+  min-height: 72px;
+  padding-top: 7px;
+  padding-bottom: 8px;
+}
+
+@media (max-width: 640px) {
+  .gem-category-item:hover .gem-category-icon {
+    transform:
+      translateY(5px)
+      rotate(8deg)
+      scale(1.2);
+  }
+
+  .gem-category-item:hover .gem-category-name {
+    transform: translateY(5px);
+  }
+}
