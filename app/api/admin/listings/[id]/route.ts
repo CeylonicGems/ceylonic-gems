@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+type ChangeValue = string | number | null;
+
+type SavedEditChange = {
+  before?: ChangeValue;
+  after?: ChangeValue;
+};
+
+type SavedEditChanges = Record<string, SavedEditChange>;
 
 export async function PATCH(
   request: Request,
@@ -36,15 +44,28 @@ export async function PATCH(
 
     const body = await request.json();
     const action = String(body.action ?? "");
-    const note = String(body.note ?? "").slice(0, 1500);
+    const note = String(body.note ?? "")
+      .trim()
+      .slice(0, 1500);
 
     const admin = createAdminClient();
 
-    const { data: gem } = await admin
+    const { data: gem, error: gemError } = await admin
       .from("gems")
-      .select("payment_status,name")
+      .select(`
+        payment_status,
+        name,
+        status,
+        edit_previous_status,
+        seller_edited_at,
+        seller_edit_changes
+      `)
       .eq("id", id)
-      .single();
+      .maybeSingle();
+
+    if (gemError) {
+      throw gemError;
+    }
 
     if (!gem) {
       return NextResponse.json(
@@ -53,41 +74,180 @@ export async function PATCH(
       );
     }
 
+    const isSellerEdit =
+      Boolean(gem.seller_edited_at) &&
+      Boolean(gem.edit_previous_status);
+
     if (action === "approve") {
       if (gem.payment_status !== "paid") {
         return NextResponse.json(
-          { error: "The listing fee has not been paid." },
+          {
+            error:
+              "The listing fee has not been paid.",
+          },
           { status: 409 }
         );
       }
 
-      await admin
+      const { error: updateError } = await admin
         .from("gems")
         .update({
           status: "published",
           published_at: new Date().toISOString(),
           admin_note: null,
+
+          seller_edit_reason: null,
+          seller_edit_changes: {},
+          seller_edited_at: null,
+          edit_previous_status: null,
         })
         .eq("id", id);
+
+      if (updateError) {
+        throw updateError;
+      }
     } else if (
       action === "changes_requested" &&
       note
     ) {
-      await admin
+      const { error: updateError } = await admin
         .from("gems")
         .update({
           status: "changes_requested",
           admin_note: note,
         })
         .eq("id", id);
+
+      if (updateError) {
+        throw updateError;
+      }
     } else if (action === "reject" && note) {
-      await admin
-        .from("gems")
-        .update({
-          status: "rejected",
-          admin_note: note,
-        })
-        .eq("id", id);
+      /*
+       * Rejecting an edit to a previously published
+       * gemstone must restore the old information and
+       * return the listing to the Gem Lobby.
+       */
+      if (isSellerEdit) {
+        const changes =
+          gem.seller_edit_changes &&
+          typeof gem.seller_edit_changes === "object" &&
+          !Array.isArray(gem.seller_edit_changes)
+            ? (gem.seller_edit_changes as SavedEditChanges)
+            : {};
+
+        const restoredValues: Record<string, unknown> = {
+          status: gem.edit_previous_status,
+          published_at:
+            gem.edit_previous_status === "published"
+              ? new Date().toISOString()
+              : null,
+
+          admin_note: `Seller edit rejected: ${note}`,
+
+          seller_edit_reason: null,
+          seller_edit_changes: {},
+          seller_edited_at: null,
+          edit_previous_status: null,
+        };
+
+        const fieldMap: Array<{
+          label: string;
+          column: string;
+        }> = [
+          {
+            label: "Gemstone name",
+            column: "name",
+          },
+          {
+            label: "Gem type",
+            column: "gem_type",
+          },
+          {
+            label: "Variety",
+            column: "variety",
+          },
+          {
+            label: "Origin",
+            column: "origin",
+          },
+          {
+            label: "Carat weight",
+            column: "carat",
+          },
+          {
+            label: "Asking price",
+            column: "price",
+          },
+          {
+            label: "Currency",
+            column: "currency",
+          },
+          {
+            label: "Treatment",
+            column: "treatment",
+          },
+          {
+            label: "Clarity",
+            column: "clarity",
+          },
+          {
+            label: "Cut",
+            column: "cut",
+          },
+          {
+            label: "Colour",
+            column: "color",
+          },
+          {
+            label: "Dimensions",
+            column: "dimensions",
+          },
+          {
+            label: "Description",
+            column: "description",
+          },
+        ];
+
+        for (const field of fieldMap) {
+          const savedChange = changes[field.label];
+
+          if (
+            savedChange &&
+            Object.prototype.hasOwnProperty.call(
+              savedChange,
+              "before"
+            )
+          ) {
+            restoredValues[field.column] =
+              savedChange.before ?? null;
+          }
+        }
+
+        const { error: restoreError } = await admin
+          .from("gems")
+          .update(restoredValues)
+          .eq("id", id);
+
+        if (restoreError) {
+          throw restoreError;
+        }
+      } else {
+        /*
+         * This is a completely new gemstone submission,
+         * so rejection applies to the whole listing.
+         */
+        const { error: rejectError } = await admin
+          .from("gems")
+          .update({
+            status: "rejected",
+            admin_note: note,
+          })
+          .eq("id", id);
+
+        if (rejectError) {
+          throw rejectError;
+        }
+      }
     } else {
       return NextResponse.json(
         {
@@ -106,11 +266,24 @@ export async function PATCH(
       details: {
         note,
         gem_name: gem.name,
+        seller_edit_review: isSellerEdit,
+        restored_status:
+          action === "reject" && isSellerEdit
+            ? gem.edit_previous_status
+            : null,
       },
     });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({
+      ok: true,
+      sellerEditReview: isSellerEdit,
+    });
   } catch (error) {
+    console.error(
+      "Administrator listing action failed:",
+      error
+    );
+
     return NextResponse.json(
       {
         error:
