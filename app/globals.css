@@ -1760,3 +1760,292 @@
     max-width: 84px !important;
   }
 }
+
+/* =========================================================
+   APPLE-STYLE FULL-SCREEN GEMSTONE HERO
+   ========================================================= */
+
+.apple-fullscreen-hero {
+  position: relative !important;
+
+  width: 100vw !important;
+  min-height: calc(100svh - 116px) !important;
+
+  margin-left: calc(50% - 50vw) !important;
+  padding: 0 !important;
+
+  overflow: hidden !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+
+  background: #000000 !important;
+}
+
+/* Text floats over the gemstone image */
+
+.apple-fullscreen-hero .hero-copy {
+  position: absolute !important;
+  top: clamp(38px, 7vh, 80px) !important;
+  right: 24px !important;
+  left: 24px !important;
+
+  z-index: 5 !important;
+
+  width: min(900px, calc(100% - 48px)) !important;
+  margin: 0 auto !important;
+
+  text-align: center !important;
+  pointer-events: none !important;
+}
+
+.apple-fullscreen-hero .hero-copy .eyebrow {
+  display: inline-block !important;
+
+  margin-bottom: 12px !important;
+
+  color: rgba(255, 255, 255, 0.72) !important;
+  font-size: 0.68rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.18em !important;
+
+  text-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.8) !important;
+}
+
+.apple-fullscreen-hero .hero-copy h1 {
+  max-width: 920px !important;
+  margin: 0 auto !important;
+
+  color: #ffffff !important;
+
+  font-size:
+    clamp(3.2rem, 7.2vw, 7.4rem) !important;
+
+  font-weight: 720 !important;
+  line-height: 0.92 !important;
+  letter-spacing: -0.065em !important;
+
+  text-shadow:
+    0 3px 18px rgba(0, 0, 0, 0.7),
+    0 18px 50px rgba(0, 0, 0, 0.5) !important;
+}
+
+.apple-fullscreen-hero .hero-copy p {
+  max-width: 720px !important;
+
+  margin:
+    clamp(18px, 3vh, 30px)
+    auto
+    0 !important;
+
+  color: rgba(255, 255, 255, 0.8) !important;
+
+  font-size:
+    clamp(0.95rem, 1.4vw, 1.25rem) !important;
+
+  line-height: 1.5 !important;
+
+  text-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.9) !important;
+}
+
+/* Gemstone image fills the whole hero */
+
+.apple-fullscreen-hero .hero-gem {
+  position: absolute !important;
+  inset: 0 !important;
+
+  display: block !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-height: inherit !important;
+
+  margin: 0 !important;
+
+  overflow: hidden !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+
+  background: #000000 !important;
+}
+
+/* Cinematic dark overlay */
+
+.apple-fullscreen-hero .hero-gem::before {
+  content: "" !important;
+
+  position: absolute !important;
+  inset: 0 !important;
+
+  z-index: 1 !important;
+  pointer-events: none !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.68) 0%,
+      rgba(0, 0, 0, 0.18) 34%,
+      rgba(0, 0, 0, 0.06) 58%,
+      rgba(0, 0, 0, 0.72) 100%
+    ) !important;
+}
+
+/* Disable the older limited caption overlay */
+
+.apple-fullscreen-hero .hero-gem::after {
+  display: none !important;
+}
+
+.apple-fullscreen-hero .hero-gem-image {
+  display: block !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-height: inherit !important;
+
+  object-fit: cover !important;
+  object-position: center center !important;
+
+  transform: scale(1.015) !important;
+
+  transition:
+    transform 1.2s
+      cubic-bezier(0.22, 1, 0.36, 1),
+    filter 600ms ease !important;
+}
+
+.apple-fullscreen-hero .hero-gem:hover .hero-gem-image {
+  transform: scale(1.045) !important;
+  filter: brightness(1.04) contrast(1.03) !important;
+}
+
+/* Bottom gemstone caption */
+
+.apple-fullscreen-hero .hero-gem-caption {
+  position: absolute !important;
+
+  right: clamp(22px, 5vw, 74px) !important;
+  bottom: clamp(22px, 5vh, 54px) !important;
+  left: clamp(22px, 5vw, 74px) !important;
+
+  z-index: 4 !important;
+
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: space-between !important;
+  gap: 24px !important;
+
+  padding: 0 !important;
+}
+
+.apple-fullscreen-hero .hero-gem-caption strong {
+  max-width: 70% !important;
+
+  color: #ffffff !important;
+
+  font-size:
+    clamp(1.5rem, 3vw, 3.2rem) !important;
+
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.045em !important;
+
+  text-shadow:
+    0 3px 16px rgba(0, 0, 0, 0.85) !important;
+}
+
+.apple-fullscreen-hero .hero-gem-caption span {
+  padding: 9px 15px !important;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.32) !important;
+
+  border-radius: 999px !important;
+
+  background:
+    rgba(20, 20, 22, 0.48) !important;
+
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+
+  color: rgba(255, 255, 255, 0.94) !important;
+
+  font-size: 0.72rem !important;
+  font-weight: 550 !important;
+  white-space: nowrap !important;
+
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease !important;
+}
+
+.apple-fullscreen-hero
+  .hero-gem:hover
+  .hero-gem-caption
+  span {
+  transform: translateY(-2px) !important;
+
+  border-color:
+    rgba(255, 255, 255, 0.58) !important;
+
+  background:
+    rgba(255, 255, 255, 0.14) !important;
+}
+
+/* =========================================================
+   MOBILE FULL-SCREEN HERO
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .apple-fullscreen-hero {
+    min-height:
+      calc(100svh - 112px) !important;
+  }
+
+  .apple-fullscreen-hero .hero-copy {
+    top: 32px !important;
+    right: 18px !important;
+    left: 18px !important;
+
+    width: calc(100% - 36px) !important;
+  }
+
+  .apple-fullscreen-hero .hero-copy h1 {
+    font-size:
+      clamp(2.6rem, 13vw, 4.4rem) !important;
+
+    line-height: 0.94 !important;
+  }
+
+  .apple-fullscreen-hero .hero-copy p {
+    max-width: 520px !important;
+    margin-top: 18px !important;
+
+    font-size: 0.9rem !important;
+  }
+
+  .apple-fullscreen-hero .hero-gem-image {
+    object-position: center center !important;
+  }
+
+  .apple-fullscreen-hero .hero-gem-caption {
+    right: 18px !important;
+    bottom: 22px !important;
+    left: 18px !important;
+
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .apple-fullscreen-hero
+    .hero-gem-caption
+    strong {
+    max-width: 100% !important;
+    font-size: 1.65rem !important;
+  }
+}
