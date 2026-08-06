@@ -12,7 +12,7 @@ export function Footer() {
         >
           <Image
             className="footer-logo-image"
-            src="/gems/logo.png"
+            src="/gems/ceylonic-gems-logo.png"
             alt=""
             width={44}
             height={44}
