@@ -1,5 +1,5 @@
 "use client";
-
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -216,11 +216,20 @@ export function SiteHeader() {
   return (
     <>
       <header className="site-header">
-        <Link className="brand" href="/">
-          <span className="brand-mark">◆</span>
-          <span>Ceylonic Gems</span>
-        </Link>
-
+        <Link
+  className="brand"
+  href="/"
+  aria-label="Ceylonic Gems home"
+>
+  <Image
+    className="brand-logo-image"
+    src="/ceylonic-gems-logo.png"
+    alt="Ceylonic Gems"
+    width={40}
+    height={40}
+    priority
+  />
+</Link>
         <button
           type="button"
           className="mobile-menu"
