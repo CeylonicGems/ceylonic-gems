@@ -21,6 +21,16 @@ type EditableGem = {
   description: string | null;
 };
 
+type UploadedMedia = {
+  path: string;
+  mediaType: "image" | "video";
+  sortOrder: number;
+};
+
+function cleanFileName(name: string) {
+  return name.replace(/[^a-zA-Z0-9._-]/g, "_");
+}
+
 export function SellerEditForm({
   gem,
 }: {
@@ -36,10 +46,41 @@ export function SellerEditForm({
     setBusy(true);
     setMessage("");
 
-    try {
-      const form = new FormData(event.currentTarget);
+    const form = new FormData(event.currentTarget);
+    const supabase = createClient();
 
-      const response = await fetch(
+    let informationUpdated = false;
+    let uploadedMediaPaths: string[] = [];
+    let uploadedCertificatePath: string | null = null;
+
+    try {
+      const replacementImages = form
+        .getAll("replacementImages")
+        .filter(
+          (item): item is File =>
+            item instanceof File && item.size > 0
+        );
+
+      const videoValue = form.get("replacementVideo");
+      const replacementVideo =
+        videoValue instanceof File && videoValue.size > 0
+          ? videoValue
+          : null;
+
+      const certificateValue = form.get(
+        "replacementCertificate"
+      );
+
+      const replacementCertificate =
+        certificateValue instanceof File &&
+        certificateValue.size > 0
+          ? certificateValue
+          : null;
+
+      /*
+       * First update the gemstone information.
+       */
+      const updateResponse = await fetch(
         `/api/seller/listings/${gem.id}`,
         {
           method: "PATCH",
@@ -65,29 +106,220 @@ export function SellerEditForm({
         }
       );
 
-      const result = await response
+      const updateResult = await updateResponse
         .json()
         .catch(() => ({}));
 
-      if (!response.ok) {
+      if (!updateResponse.ok) {
         throw new Error(
-          result.error ?? "Unable to update gemstone."
+          updateResult.error ??
+            "Unable to update gemstone information."
         );
       }
 
+      informationUpdated = true;
+
+      const hasMediaReplacement =
+        replacementImages.length > 0 ||
+        replacementVideo !== null ||
+        replacementCertificate !== null;
+
+      /*
+       * No new files were selected.
+       */
+      if (!hasMediaReplacement) {
+        setMessage(
+          "Gemstone updated and returned for administrator review."
+        );
+
+        setTimeout(() => {
+          location.assign("/dashboard/seller");
+        }, 900);
+
+        return;
+      }
+
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        throw new Error(
+          "Your session expired. Please sign in again."
+        );
+      }
+
+      const uploadedMedia: UploadedMedia[] = [];
+
+      /*
+       * Upload replacement photographs.
+       */
+      for (
+        let index = 0;
+        index < replacementImages.length;
+        index += 1
+      ) {
+        const file = replacementImages[index];
+
+        const path =
+          `${user.id}/${gem.id}/replacements/` +
+          `${crypto.randomUUID()}-${cleanFileName(
+            file.name
+          )}`;
+
+        const { error } = await supabase.storage
+          .from("gem-media")
+          .upload(path, file, {
+            contentType: file.type,
+            upsert: false,
+          });
+
+        if (error) {
+          throw error;
+        }
+
+        uploadedMediaPaths.push(path);
+
+        uploadedMedia.push({
+          path,
+          mediaType: "image",
+          sortOrder: index,
+        });
+      }
+
+      /*
+       * Upload replacement video.
+       */
+      if (replacementVideo) {
+        const path =
+          `${user.id}/${gem.id}/replacements/` +
+          `${crypto.randomUUID()}-${cleanFileName(
+            replacementVideo.name
+          )}`;
+
+        const { error } = await supabase.storage
+          .from("gem-media")
+          .upload(path, replacementVideo, {
+            contentType: replacementVideo.type,
+            upsert: false,
+          });
+
+        if (error) {
+          throw error;
+        }
+
+        uploadedMediaPaths.push(path);
+
+        uploadedMedia.push({
+          path,
+          mediaType: "video",
+          sortOrder: 100,
+        });
+      }
+
+      /*
+       * Upload replacement certificate.
+       */
+      if (replacementCertificate) {
+        const path =
+          `${user.id}/${gem.id}/replacements/` +
+          `${crypto.randomUUID()}-${cleanFileName(
+            replacementCertificate.name
+          )}`;
+
+        const { error } = await supabase.storage
+          .from("certificates-private")
+          .upload(path, replacementCertificate, {
+            contentType: replacementCertificate.type,
+            upsert: false,
+          });
+
+        if (error) {
+          throw error;
+        }
+
+        uploadedCertificatePath = path;
+      }
+
+      /*
+       * Tell the secure API to replace only the
+       * selected file categories.
+       */
+      const mediaResponse = await fetch(
+        `/api/seller/listings/${gem.id}/media-replacement`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            replaceImages:
+              replacementImages.length > 0,
+            replaceVideo:
+              replacementVideo !== null,
+            replaceCertificate:
+              replacementCertificate !== null,
+            media: uploadedMedia,
+            certificatePath:
+              uploadedCertificatePath ?? "",
+          }),
+        }
+      );
+
+      const mediaResult = await mediaResponse
+        .json()
+        .catch(() => ({}));
+
+      if (!mediaResponse.ok) {
+        throw new Error(
+          mediaResult.error ??
+            "Unable to replace gemstone files."
+        );
+      }
+
+      /*
+       * The API accepted the files, so they must
+       * not be removed by the error cleanup.
+       */
+      uploadedMediaPaths = [];
+      uploadedCertificatePath = null;
+
       setMessage(
-        "Gemstone updated and returned for administrator review."
+        "Gemstone information and files were updated and returned for administrator review."
       );
 
       setTimeout(() => {
         location.assign("/dashboard/seller");
-      }, 900);
+      }, 1000);
     } catch (error) {
-      setMessage(
+      /*
+       * Remove newly uploaded files when the secure
+       * replacement API did not accept them.
+       */
+      if (uploadedMediaPaths.length > 0) {
+        await supabase.storage
+          .from("gem-media")
+          .remove(uploadedMediaPaths);
+      }
+
+      if (uploadedCertificatePath) {
+        await supabase.storage
+          .from("certificates-private")
+          .remove([uploadedCertificatePath]);
+      }
+
+      const errorMessage =
         error instanceof Error
           ? error.message
-          : "Unable to update gemstone."
+          : "Unable to update gemstone.";
+
+      setMessage(
+        informationUpdated
+          ? `The information was updated, but file replacement failed: ${errorMessage}`
+          : errorMessage
       );
+
       setBusy(false);
     }
   }
@@ -236,48 +468,50 @@ export function SellerEditForm({
           required
         />
       </label>
-<div className="panel">
-  <h3>Replace media</h3>
 
-  <p>
-    These fields are optional. Leave them empty to keep the
-    existing photographs, video and certificate.
-  </p>
+      <div className="panel">
+        <h3>Replace media</h3>
 
-  <label>
-    New gemstone photographs
-    <input
-      name="replacementImages"
-      type="file"
-      accept="image/jpeg,image/png,image/webp"
-      multiple
-    />
-  </label>
+        <p>
+          Leave these fields empty to keep the existing
+          photographs, video and certificate.
+        </p>
 
-  <label>
-    New gemstone video
-    <input
-      name="replacementVideo"
-      type="file"
-      accept="video/mp4,video/webm"
-    />
-  </label>
+        <label>
+          New gemstone photographs
+          <input
+            name="replacementImages"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+          />
+        </label>
 
-  <label>
-    New certificate image or PDF
-    <input
-      name="replacementCertificate"
-      type="file"
-      accept="image/jpeg,image/png,application/pdf"
-    />
-  </label>
-</div>
+        <label>
+          New gemstone video
+          <input
+            name="replacementVideo"
+            type="file"
+            accept="video/mp4,video/webm"
+          />
+        </label>
+
+        <label>
+          New certificate image or PDF
+          <input
+            name="replacementCertificate"
+            type="file"
+            accept="image/jpeg,image/png,application/pdf"
+          />
+        </label>
+      </div>
+
       <label>
         Reason for editing
         <textarea
           name="editReason"
           rows={3}
-          placeholder="Example: I entered the wrong carat weight."
+          placeholder="Example: I uploaded the wrong gemstone photograph."
           minLength={10}
           maxLength={1000}
           required
