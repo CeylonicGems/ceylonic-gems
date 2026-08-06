@@ -4,6 +4,7 @@ import { AdminListingActions } from "@/components/admin-actions";
 import { AdminVerificationActions } from "@/components/admin-verification-actions";
 import { AdminAppointmentActions } from "@/components/admin-appointment-actions";
 import { AdminDeletionActions } from "@/components/admin-deletion-actions";
+import { AdminEditSummary } from "@/components/admin-edit-summary";
 
 export default async function AdminDashboard() {
   await requireRole(["admin"]);
@@ -129,6 +130,11 @@ export default async function AdminDashboard() {
                     <span className="pill">{gem.status}</span>
                   </div>
                   <p>{gem.description}</p>
+                  <AdminEditSummary
+  changes={gem.seller_edit_changes}
+  reason={gem.seller_edit_reason}
+  editedAt={gem.seller_edited_at}
+/>
                   <div className="muted-row">
                     <span>{gem.currency} {Number(gem.price).toLocaleString()}</span>
                     <span>Fee: {gem.payment_status}</span>
