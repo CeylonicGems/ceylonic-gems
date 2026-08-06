@@ -18,11 +18,23 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       admin.from("gem_certificates").select("id,path,status,laboratory,certificate_number").eq("gem_id", id)
     ]);
 
-    const publicMedia = (media ?? []).map((item) => ({
-      label: `${item.media_type} ${item.sort_order + 1}`,
-      url: admin.storage.from("gem-media").getPublicUrl(item.path).data.publicUrl,
-      type: item.media_type
-    }));
+    const signedMedia = await Promise.all(
+  (media ?? []).map(async (item, index) => {
+    const { data, error } = await admin.storage
+      .from("gem-media")
+      .createSignedUrl(item.path, 300);
+
+    if (error || !data?.signedUrl) {
+      throw error ?? new Error("Gemstone media link failed.");
+    }
+
+    return {
+      label: `${item.media_type} ${index + 1}`,
+      url: data.signedUrl,
+      type: item.media_type,
+    };
+  })
+);
 
     const privateCertificates = await Promise.all((certificates ?? []).map(async (certificate) => {
       const { data, error } = await admin.storage.from("certificates-private").createSignedUrl(certificate.path, 300);
@@ -39,10 +51,14 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       action: "listing_files_viewed",
       entity_type: "gem",
       entity_id: id,
-      details: { media_count: publicMedia.length, certificate_count: privateCertificates.length }
-    });
+      details: {
+  media_count: signedMedia.length,
+  certificate_count: privateCertificates.length,
+});
 
-    return NextResponse.json({ files: [...publicMedia, ...privateCertificates] });
+    return NextResponse.json({
+  files: [...signedMedia, ...privateCertificates],
+});
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to review listing files." }, { status: 500 });
   }
