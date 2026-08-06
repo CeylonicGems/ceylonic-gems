@@ -10,10 +10,10 @@ export function Footer() {
           href="/"
           aria-label="Ceylonic Gems home"
         >
-         <img
-  className="footer-logo-image"
-  src="/gems/ceylonic-gems-logo.png"
-  alt="Ceylonic Gems logo"
+          <Image
+            className="footer-logo-image"
+            src="/ceylonic-gems-logo.png"
+            alt="Ceylonic Gems logo"
             width={44}
             height={44}
           />
