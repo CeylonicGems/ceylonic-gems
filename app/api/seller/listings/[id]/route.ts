@@ -2,6 +2,13 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+type ChangeValue = string | number | null;
+
+type FieldChange = {
+  before: ChangeValue;
+  after: ChangeValue;
+};
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -12,18 +19,41 @@ export async function PATCH(
 
     const name = String(body.name ?? "").trim();
     const gemType = String(body.gemType ?? "").trim();
-    const variety = String(body.variety ?? "").trim();
-    const origin = String(body.origin ?? "").trim();
-    const currency = String(body.currency ?? "LKR")
+
+    const variety =
+      String(body.variety ?? "").trim() || null;
+
+    const origin =
+      String(body.origin ?? "").trim() || null;
+
+    const treatment =
+      String(body.treatment ?? "").trim() || null;
+
+    const clarity =
+      String(body.clarity ?? "").trim() || null;
+
+    const cut =
+      String(body.cut ?? "").trim() || null;
+
+    const color =
+      String(body.color ?? "").trim() || null;
+
+    const dimensions =
+      String(body.dimensions ?? "").trim() || null;
+
+    const description = String(
+      body.description ?? ""
+    ).trim();
+
+    const currency = String(
+      body.currency ?? "LKR"
+    )
       .trim()
       .toUpperCase();
-    const treatment = String(body.treatment ?? "").trim();
-    const clarity = String(body.clarity ?? "").trim();
-    const cut = String(body.cut ?? "").trim();
-    const color = String(body.color ?? "").trim();
-    const dimensions = String(body.dimensions ?? "").trim();
-    const description = String(body.description ?? "").trim();
-    const editReason = String(body.editReason ?? "").trim();
+
+    const editReason = String(
+      body.editReason ?? ""
+    ).trim();
 
     const carat = Number(body.carat);
     const price = Number(body.price);
@@ -73,63 +103,38 @@ export async function PATCH(
       );
     }
 
-    if (editReason.length > 1000) {
-      return NextResponse.json(
-        {
-          error:
-            "The edit reason cannot exceed 1,000 characters.",
-        },
-        { status: 400 }
-      );
-    }
-
     const supabase = await createClient();
 
     const {
       data: { user },
-      error: userError,
     } = await supabase.auth.getUser();
 
-    if (userError || !user) {
+    if (!user) {
       return NextResponse.json(
-        {
-          error:
-            "Authentication required. Please sign in again.",
-        },
+        { error: "Please sign in again." },
         { status: 401 }
       );
     }
 
-    const { data: profile, error: profileError } =
-      await supabase
-        .from("profiles")
-        .select("role, verification_status")
-        .eq("id", user.id)
-        .maybeSingle();
-
-    if (profileError) {
-      throw profileError;
-    }
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role,verification_status")
+      .eq("id", user.id)
+      .maybeSingle();
 
     if (
       !profile ||
       !["seller", "both"].includes(profile.role)
     ) {
       return NextResponse.json(
-        {
-          error:
-            "Only seller accounts can edit gemstone listings.",
-        },
+        { error: "Seller account required." },
         { status: 403 }
       );
     }
 
     if (profile.verification_status !== "verified") {
       return NextResponse.json(
-        {
-          error:
-            "Your seller account must be verified before editing a gemstone.",
-        },
+        { error: "Seller verification is required." },
         { status: 403 }
       );
     }
@@ -140,18 +145,28 @@ export async function PATCH(
       .from("gems")
       .select(`
         id,
-        name,
         seller_id,
         status,
         payment_status,
-        deletion_requested
+        deletion_requested,
+        name,
+        gem_type,
+        variety,
+        origin,
+        carat,
+        price,
+        currency,
+        treatment,
+        clarity,
+        cut,
+        color,
+        dimensions,
+        description
       `)
       .eq("id", id)
       .maybeSingle();
 
-    if (gemError) {
-      throw gemError;
-    }
+    if (gemError) throw gemError;
 
     if (!gem) {
       return NextResponse.json(
@@ -174,7 +189,7 @@ export async function PATCH(
       return NextResponse.json(
         {
           error:
-            "This gemstone has a pending deletion request. Resolve that request before editing.",
+            "Resolve the deletion request before editing.",
         },
         { status: 409 }
       );
@@ -182,36 +197,57 @@ export async function PATCH(
 
     if (gem.status === "sold") {
       return NextResponse.json(
-        {
-          error: "A sold gemstone cannot be edited.",
-        },
+        { error: "A sold gemstone cannot be edited." },
         { status: 409 }
       );
     }
 
-    const {
-      data: transaction,
-      error: transactionError,
-    } = await admin
+    const { data: transaction } = await admin
       .from("transactions")
       .select("id")
       .eq("gem_id", id)
       .limit(1)
       .maybeSingle();
 
-    if (transactionError) {
-      throw transactionError;
-    }
-
     if (transaction) {
       return NextResponse.json(
         {
           error:
-            "This gemstone has a recorded sale transaction and cannot be edited.",
+            "A gemstone with a sale transaction cannot be edited.",
         },
         { status: 409 }
       );
     }
+
+    const changes: Record<string, FieldChange> = {};
+
+    function recordChange(
+      field: string,
+      before: ChangeValue,
+      after: ChangeValue
+    ) {
+      if (before !== after) {
+        changes[field] = { before, after };
+      }
+    }
+
+    recordChange("Gemstone name", gem.name, name);
+    recordChange("Gem type", gem.gem_type, gemType);
+    recordChange("Variety", gem.variety, variety);
+    recordChange("Origin", gem.origin, origin);
+    recordChange("Carat weight", Number(gem.carat), carat);
+    recordChange("Asking price", Number(gem.price), price);
+    recordChange("Currency", gem.currency, currency);
+    recordChange("Treatment", gem.treatment, treatment);
+    recordChange("Clarity", gem.clarity, clarity);
+    recordChange("Cut", gem.cut, cut);
+    recordChange("Colour", gem.color, color);
+    recordChange("Dimensions", gem.dimensions, dimensions);
+    recordChange(
+      "Description",
+      gem.description,
+      description
+    );
 
     const now = new Date().toISOString();
 
@@ -225,18 +261,19 @@ export async function PATCH(
       .update({
         name,
         gem_type: gemType,
-        variety: variety || null,
-        origin: origin || null,
+        variety,
+        origin,
         carat,
         price,
         currency,
-        treatment: treatment || null,
-        clarity: clarity || null,
-        cut: cut || null,
-        color: color || null,
-        dimensions: dimensions || null,
+        treatment,
+        clarity,
+        cut,
+        color,
+        dimensions,
         description,
         seller_edit_reason: editReason,
+        seller_edit_changes: changes,
         seller_edited_at: now,
         edit_previous_status: gem.status,
         status: nextStatus,
@@ -247,37 +284,26 @@ export async function PATCH(
       .eq("id", id)
       .eq("seller_id", user.id);
 
-    if (updateError) {
-      throw updateError;
-    }
+    if (updateError) throw updateError;
 
-    const { error: auditError } = await admin
-      .from("audit_logs")
-      .insert({
-        actor_id: user.id,
-        action: "listing_edited_by_seller",
-        entity_type: "gem",
-        entity_id: id,
-        details: {
-          previous_name: gem.name,
-          new_name: name,
-          previous_status: gem.status,
-          new_status: nextStatus,
-          edit_reason: editReason,
-        },
-      });
-
-    if (auditError) {
-      console.error(
-        "Gemstone edit audit log failed:",
-        auditError
-      );
-    }
+    await admin.from("audit_logs").insert({
+      actor_id: user.id,
+      action: "listing_edited_by_seller",
+      entity_type: "gem",
+      entity_id: id,
+      details: {
+        edit_reason: editReason,
+        changed_fields: changes,
+        previous_status: gem.status,
+        new_status: nextStatus,
+      },
+    });
 
     return NextResponse.json({
       ok: true,
+      changes,
       message:
-        "Gemstone updated and returned to administrator review.",
+        "Gemstone updated and returned for administrator review.",
     });
   } catch (error) {
     console.error("Seller gemstone edit error:", error);
