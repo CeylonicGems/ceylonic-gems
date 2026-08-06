@@ -19,55 +19,46 @@ const gemCategories: Array<{
   name: string;
   slug: string;
   shape: GemIconShape;
-  colourClass: string;
 }> = [
   {
     name: "Blue Sapphire",
     slug: "blue-sapphire",
     shape: "diamond",
-    colourClass: "gem-blue",
   },
   {
     name: "Yellow Sapphire",
     slug: "yellow-sapphire",
     shape: "oval",
-    colourClass: "gem-yellow",
   },
   {
     name: "Spinel",
     slug: "spinel",
     shape: "square",
-    colourClass: "gem-pink",
   },
   {
     name: "Ruby",
     slug: "ruby",
     shape: "octagon",
-    colourClass: "gem-red",
   },
   {
     name: "Star Sapphire",
     slug: "star-sapphire",
     shape: "star",
-    colourClass: "gem-star-blue",
   },
   {
     name: "Pink Sapphire",
     slug: "pink-sapphire",
     shape: "cushion",
-    colourClass: "gem-purple",
   },
   {
     name: "Chrysoberyl",
     slug: "chrysoberyl",
     shape: "emerald",
-    colourClass: "gem-green",
   },
   {
     name: "Moonstone",
     slug: "moonstone",
     shape: "pear",
-    colourClass: "gem-moonstone",
   },
 ];
 
@@ -78,12 +69,8 @@ function GemCategoryIcon({
 }) {
   if (shape === "oval") {
     return (
-      <svg
-        viewBox="0 0 64 64"
-        aria-hidden="true"
-      >
+      <svg viewBox="0 0 64 64" aria-hidden="true">
         <ellipse cx="32" cy="32" rx="19" ry="27" />
-
         <path d="M32 5 22 17l-5 15 5 15 10 12" />
         <path d="M32 5 42 17l5 15-5 15-10 12" />
         <path d="m22 17 10 8 10-8" />
@@ -95,12 +82,20 @@ function GemCategoryIcon({
 
   if (shape === "square") {
     return (
-      <svg
-        viewBox="0 0 64 64"
-        aria-hidden="true"
-      >
-        <rect x="10" y="10" width="44" height="44" rx="3" />
-        <rect x="18" y="18" width="28" height="28" />
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <rect
+          x="10"
+          y="10"
+          width="44"
+          height="44"
+          rx="3"
+        />
+        <rect
+          x="18"
+          y="18"
+          width="28"
+          height="28"
+        />
         <path d="m10 10 8 8M54 10l-8 8M10 54l8-8M54 54l-8-8" />
       </svg>
     );
@@ -108,10 +103,7 @@ function GemCategoryIcon({
 
   if (shape === "octagon") {
     return (
-      <svg
-        viewBox="0 0 64 64"
-        aria-hidden="true"
-      >
+      <svg viewBox="0 0 64 64" aria-hidden="true">
         <path d="M21 7h22l14 14v22L43 57H21L7 43V21Z" />
         <path d="M24 15h16l9 9v16l-9 9H24l-9-9V24Z" />
         <path d="m21 7 3 8M43 7l-3 8M57 21l-8 3M57 43l-8-3M43 57l-3-8M21 57l3-8M7 43l8-3M7 21l8 3" />
@@ -121,10 +113,7 @@ function GemCategoryIcon({
 
   if (shape === "star") {
     return (
-      <svg
-        viewBox="0 0 64 64"
-        aria-hidden="true"
-      >
+      <svg viewBox="0 0 64 64" aria-hidden="true">
         <ellipse cx="32" cy="32" rx="20" ry="27" />
         <path d="M32 5v54M12 32h40M18 13l28 38M46 13 18 51" />
         <circle cx="32" cy="32" r="7" />
@@ -134,10 +123,7 @@ function GemCategoryIcon({
 
   if (shape === "cushion") {
     return (
-      <svg
-        viewBox="0 0 64 64"
-        aria-hidden="true"
-      >
+      <svg viewBox="0 0 64 64" aria-hidden="true">
         <path d="M18 7h28l11 11v28L46 57H18L7 46V18Z" />
         <path d="M22 15h20l7 7v20l-7 7H22l-7-7V22Z" />
         <path d="m18 7 4 8M46 7l-4 8M57 18l-8 4M57 46l-8-4M46 57l-4-8M18 57l4-8M7 46l8-4M7 18l8 4" />
@@ -147,10 +133,7 @@ function GemCategoryIcon({
 
   if (shape === "emerald") {
     return (
-      <svg
-        viewBox="0 0 64 64"
-        aria-hidden="true"
-      >
+      <svg viewBox="0 0 64 64" aria-hidden="true">
         <path d="M19 6h26l12 12v28L45 58H19L7 46V18Z" />
         <path d="M22 14h20l7 7v22l-7 7H22l-7-7V21Z" />
         <path d="M22 14v36M42 14v36M15 21h34M15 43h34" />
@@ -160,10 +143,7 @@ function GemCategoryIcon({
 
   if (shape === "pear") {
     return (
-      <svg
-        viewBox="0 0 64 64"
-        aria-hidden="true"
-      >
+      <svg viewBox="0 0 64 64" aria-hidden="true">
         <path d="M32 5C27 16 12 26 12 41c0 11 9 18 20 18s20-7 20-18C52 26 37 16 32 5Z" />
         <path d="m32 5-8 24 8 30 8-30Z" />
         <path d="M16 34h32M20 49l12-20 12 20" />
@@ -171,20 +151,13 @@ function GemCategoryIcon({
     );
   }
 
-  if (shape === "diamond") {
-    return (
-      <svg
-        viewBox="0 0 64 64"
-        aria-hidden="true"
-      >
-        <path d="M14 11h36l10 15-28 33L4 26Z" />
-        <path d="m14 11 8 15 10-15 10 15 8-15" />
-        <path d="M4 26h56M22 26l10 33 10-33" />
-      </svg>
-    );
-  }
-
-  return null;
+  return (
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M14 11h36l10 15-28 33L4 26Z" />
+      <path d="m14 11 8 15 10-15 10 15 8-15" />
+      <path d="M4 26h56M22 26l10 33 10-33" />
+    </svg>
+  );
 }
 
 export function SiteHeader() {
@@ -216,72 +189,54 @@ export function SiteHeader() {
 
   return (
     <>
-     <Link
-  className="mobile-header-brand"
-  href="/"
-  aria-label="Ceylonic Gems home"
->
-  <Image
-    src="/ceylonic-gems-logo.png"
-    alt=""
-    width={38}
-    height={38}
-    priority
-  />
-</Link>
+      <header className="site-header ceylonic-header-v2">
         <Link
-  className="brand"
-  href="/"
-  aria-label="Ceylonic Gems home"
->
-  <Image
-    className="brand-logo-image"
-    src="/ceylonic-gems-logo.png"
-    alt="Ceylonic Gems"
-    width={40}
-    height={40}
-    priority
-  />
-</Link>
+          className="mobile-header-brand"
+          href="/"
+          aria-label="Ceylonic Gems home"
+        >
+          <Image
+            src="/ceylonic-gems-logo.png"
+            alt=""
+            width={34}
+            height={34}
+            priority
+          />
+        </Link>
+
         <button
           type="button"
           className="mobile-menu"
           onClick={() => setOpen((value) => !value)}
-          aria-label="Open menu"
+          aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
         >
-          ☰
+          {open ? "×" : "☰"}
         </button>
 
-       <nav className={open ? "main-nav open" : "main-nav"}>
-  <Link
-    className="desktop-nav-logo"
-    href="/"
-    aria-label="Ceylonic Gems home"
-    onClick={() => setOpen(false)}
-  >
-    <Image
-      src="/ceylonic-gems-logo.png"
-      alt=""
-      width={22}
-      height={22}
-      priority
-    />
-  </Link>
+        <nav
+          className={
+            open
+              ? "main-nav ceylonic-main-nav open"
+              : "main-nav ceylonic-main-nav"
+          }
+          aria-label="Main navigation"
+        >
+          <Link
+            className="desktop-nav-logo"
+            href="/"
+            aria-label="Ceylonic Gems home"
+            onClick={() => setOpen(false)}
+          >
+            <Image
+              src="/ceylonic-gems-logo.png"
+              alt=""
+              width={22}
+              height={22}
+              priority
+            />
+          </Link>
 
-  <Link
-    href="/#lobby"
-    onClick={() => setOpen(false)}
-  >
-    Gem Lobby
-  </Link>
-
-  <Link
-    href="/gems"
-    onClick={() => setOpen(false)}
-  >
-    Our Gems
-  </Link>
           <Link
             href="/#lobby"
             onClick={() => setOpen(false)}
@@ -317,13 +272,31 @@ export function SiteHeader() {
             Contact
           </Link>
 
-          {signed && (
+          {signed ? (
+            <>
+              <Link
+                className="mobile-dashboard-link"
+                href="/dashboard"
+                onClick={() => setOpen(false)}
+              >
+                Dashboard
+              </Link>
+
+              <button
+                type="button"
+                className="mobile-signout-button"
+                onClick={out}
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
             <Link
-              className="mobile-dashboard-link"
-              href="/dashboard"
+              className="mobile-auth-link"
+              href="/login"
               onClick={() => setOpen(false)}
             >
-              Dashboard
+              Sign In
             </Link>
           )}
         </nav>
@@ -355,15 +328,16 @@ export function SiteHeader() {
             </Link>
           )}
         </div>
+      </header>
 
       <nav
-        className="gem-category-bar"
+        className="gem-category-bar ceylonic-category-bar-v2"
         aria-label="Gemstone categories"
       >
         <div className="gem-category-track">
           {gemCategories.map((gem) => (
             <Link
-              className={`gem-category-item ${gem.colourClass}`}
+              className="gem-category-item"
               href={`/gems?type=${encodeURIComponent(
                 gem.name
               )}`}
