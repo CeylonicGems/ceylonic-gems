@@ -117,3 +117,188 @@
     color: #ffffff;
   }
 }
+/* Apple-inspired gemstone category navigation */
+
+.gem-category-bar {
+  position: relative;
+  z-index: 35;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(7, 10, 16, 0.98),
+      rgba(3, 7, 13, 0.98)
+    );
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.gem-category-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.gem-category-track {
+  display: flex;
+  width: max-content;
+  min-width: 100%;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 24px 13px;
+}
+
+.gem-category-item {
+  display: flex;
+  min-width: 104px;
+  max-width: 118px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  padding: 9px 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  color: rgba(255, 255, 255, 0.78);
+  text-align: center;
+  text-decoration: none;
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.gem-category-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.055);
+  color: #ffffff;
+}
+
+.gem-category-item:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 2px;
+}
+
+.gem-category-icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  color: currentColor;
+  filter: drop-shadow(
+    0 0 7px currentColor
+  );
+  transition:
+    transform 180ms ease,
+    filter 180ms ease;
+}
+
+.gem-category-item:hover .gem-category-icon {
+  transform: scale(1.06);
+  filter: drop-shadow(
+    0 0 11px currentColor
+  );
+}
+
+.gem-category-icon svg {
+  display: block;
+  width: 46px;
+  height: 46px;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.gem-category-name {
+  display: block;
+  min-height: 30px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.76rem;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.gem-blue {
+  color: #39bfff;
+}
+
+.gem-yellow {
+  color: #ffcf45;
+}
+
+.gem-pink {
+  color: #ff5ca8;
+}
+
+.gem-red {
+  color: #ff4545;
+}
+
+.gem-star-blue {
+  color: #73b9ff;
+}
+
+.gem-purple {
+  color: #ff72d8;
+}
+
+.gem-green {
+  color: #71f35f;
+}
+
+.gem-moonstone {
+  color: #c7e8ff;
+}
+
+@media (max-width: 980px) {
+  .gem-category-track {
+    min-width: max-content;
+    justify-content: flex-start;
+    gap: 5px;
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .gem-category-item {
+    min-width: 94px;
+    max-width: 104px;
+  }
+}
+
+@media (max-width: 640px) {
+  .gem-category-track {
+    gap: 2px;
+    padding: 11px 12px 10px;
+  }
+
+  .gem-category-item {
+    min-width: 84px;
+    max-width: 92px;
+    gap: 5px;
+    padding: 7px 5px 8px;
+    border-radius: 13px;
+  }
+
+  .gem-category-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .gem-category-icon svg {
+    width: 39px;
+    height: 39px;
+  }
+
+  .gem-category-name {
+    min-height: 27px;
+    font-size: 0.68rem;
+  }
+}
