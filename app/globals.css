@@ -871,3 +871,112 @@
     transform: translateY(5px);
   }
 }
+/* Make featured gemstone text clearly visible */
+
+.hero-gem {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Dark gradient behind the caption */
+
+.hero-gem::after {
+  content: "";
+
+  position: absolute;
+  inset: 32% 0 0;
+
+  z-index: 1;
+  pointer-events: none;
+
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.22) 38%,
+    rgba(0, 0, 0, 0.78) 100%
+  );
+}
+
+.hero-gem-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-gem-caption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  z-index: 2;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 42px 28px 24px;
+
+  color: #ffffff;
+}
+
+.hero-gem-caption strong {
+  max-width: 75%;
+
+  color: #ffffff;
+  font-size: clamp(1.4rem, 2.3vw, 2.15rem);
+  font-weight: 720;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+
+  text-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.9),
+    0 8px 24px rgba(0, 0, 0, 0.75);
+}
+
+.hero-gem-caption span {
+  flex-shrink: 0;
+
+  padding: 7px 11px;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+
+  background: rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.73rem;
+  font-weight: 500;
+
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+}
+
+.hero-gem:hover .hero-gem-caption span {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 640px) {
+  .hero-gem-caption {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+
+    padding: 50px 18px 18px;
+  }
+
+  .hero-gem-caption strong {
+    max-width: 100%;
+    font-size: 1.45rem;
+  }
+
+  .hero-gem-caption span {
+    font-size: 0.67rem;
+  }
+}
