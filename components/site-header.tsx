@@ -355,7 +355,6 @@ export function SiteHeader() {
             </Link>
           )}
         </div>
-      </header>
 
       <nav
         className="gem-category-bar"
